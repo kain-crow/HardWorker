@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -24,7 +25,7 @@ public class UserService {
     private final ProjectService projectService;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository repository, RoleService roleService, ProjectService projectService, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository repository, RoleService roleService, @Lazy ProjectService projectService, PasswordEncoder passwordEncoder) {
         this.repository = repository;
         this.roleService = roleService;
         this.projectService = projectService;

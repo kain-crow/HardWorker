@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 /**
@@ -23,7 +24,7 @@ public class ProjectService {
     private final ProjectRepository repository;
     private final UserService userService;
 
-    public ProjectService(ProjectRepository repository, UserService userService) {
+    public ProjectService(ProjectRepository repository, @Lazy UserService userService) {
         this.repository = repository;
         this.userService = userService;
     }
