@@ -47,28 +47,31 @@ public class ProjectService {
     public Project getProjectByName(String name) {
         return repository.getProjectByName(name);
     }
+
+    private Project toProject(ProjectDTO dto){
+        if(dto != null){
+            var project = new Project();
+            project.setProjectId(dto.getId() == null ? UUID.randomUUID() : dto.getId());
+            project.setName(dto.getName());
+            project.setCustomer(dto.getCustomer());
+            project.setListUsers(dto.getListUsers() != null
+                    ? dto.getListUsers().stream().map(userService::getUserById).collect(Collectors.toSet())
+                    : null);
+            return project;
+        }
+        return null;
+    }
     
     public Project create(ProjectDTO obj){
-        var project = new Project();
-        project.setProjectId(obj.getId() == null ? UUID.randomUUID() : obj.getId());
-        project.setName(obj.getName());
-        project.setCustomer(obj.getCustomer());
-        project.setListUsers(obj.getListUsers() != null
-                ? obj.getListUsers().stream().map(userService::getUserById).collect(Collectors.toList())
-                : null);
-        return repository.save(project);
+        return obj != null
+            ? repository.save(toProject(obj))
+            : null;
     }
     
     public Project update(UUID id, ProjectDTO obj){
         var project = findById(id);
-        if(project != null && obj != null){
-            project.setCustomer(obj.getCustomer());
-            project.setName(obj.getName());
-            project.setListUsers(obj.getListUsers() != null 
-                ? obj.getListUsers().stream().map(userService::getUserById).collect(Collectors.toList())
-                : null);
-            repository.save(project);
-        }
-        return null;
+        return project != null && obj != null
+                ? repository.save(toProject(obj))
+                : null;
     }
 }

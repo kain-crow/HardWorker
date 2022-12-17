@@ -1,14 +1,12 @@
 package com.hardworker.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;
-import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 /**
  *
@@ -19,6 +17,9 @@ import java.util.UUID;
 @Getter
 @Setter
 @RequiredArgsConstructor
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "userId")
 public class User implements Serializable {
     
     @Id
@@ -52,5 +53,13 @@ public class User implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "id_role")
             )
     private List<Role> userRoles = new ArrayList<>();
+
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "rel_project_user",
+            joinColumns = @JoinColumn(name = "id_user"),
+            inverseJoinColumns = @JoinColumn(name = "id_project")
+    )
+    private Set<Project> listProjects = new HashSet<>();
 
 }

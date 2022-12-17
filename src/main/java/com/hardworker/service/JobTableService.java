@@ -29,7 +29,6 @@ public class JobTableService {
     
     private final JobTableRepository repository;
     private final ProjectService projectService;
-
     private final UserService userService;
 
     public JobTableService(JobTableRepository repository,
@@ -48,6 +47,10 @@ public class JobTableService {
         return list().stream().distinct().map(JobTableListDTO::of).toList();
     }
 
+    public  List<JobTable> findByTableId(String tableId) {
+        return repository.findAllByTableId(tableId);
+    }
+
     public JobTable findById(UUID id) {
         return repository.findById(id).orElse(null);
     }
@@ -58,50 +61,42 @@ public class JobTableService {
             return String.format("Table with id %s has been deleted", id);
         } return String.format("Table with id %s not found", id);
     }
+
+    private JobTable toTable(JobTableItemDTO dto){
+        if(dto != null) {
+            var user = userService.getUserByLogin(SecurityConfig.getUserName());
+            var jobTable = new JobTable();
+            jobTable.setId(dto.getId() == null ? UUID.randomUUID() : dto.getId());
+            jobTable.setTable_id(getMd5Hash(user.getUserId().toString(), dto.getDate_from().toString(), dto.getDate_to().toString()));
+            jobTable.setUser(user);
+            jobTable.setDateFrom(dto.getDate_from());
+            jobTable.setDateTo(dto.getDate_to());
+            jobTable.setProject(projectService.findById(dto.getProject_id()));
+            jobTable.setProjectType(dto.getProjectType());
+            jobTable.setProjectDescription(dto.getProjectDescription());
+            jobTable.setMonday(dto.getMonday());
+            jobTable.setTuesday(dto.getTuesday());
+            jobTable.setWednesday(dto.getWednesday());
+            jobTable.setThursday(dto.getThursday());
+            jobTable.setFriday(dto.getFriday());
+            jobTable.setSaturday(dto.getSaturday());
+            jobTable.setSunday(dto.getSunday());
+            return jobTable;
+        }
+        return null;
+    }
     
     public JobTable create(JobTableItemDTO obj){
-        var user = userService.getUserByLogin(SecurityConfig.getUserName());
-        var jobTable = new JobTable();
-            jobTable.setId(obj.getId() == null ? UUID.randomUUID() : obj.getId());
-            jobTable.setTable_id(getMd5Hash(user.getUserId().toString(), obj.getDate_from().toString(), obj.getDate_to().toString()));
-            jobTable.setUser(user);
-            jobTable.setDateFrom(obj.getDate_from());
-            jobTable.setDateTo(obj.getDate_to());
-            jobTable.setProject(projectService.findById(obj.getProject_id()));
-            jobTable.setProjectType(obj.getProjectType());
-            jobTable.setProjectDescription(obj.getProjectDescription());
-            jobTable.setMonday(obj.getMonday());
-            jobTable.setTuesday(obj.getTuesday());
-            jobTable.setWednesday(obj.getWednesday());
-            jobTable.setThursday(obj.getThursday());
-            jobTable.setFriday(obj.getFriday());
-            jobTable.setSaturday(obj.getSaturday());
-            jobTable.setSunday(obj.getSunday());
-        return repository.save(jobTable);
+        return obj != null
+            ? repository.save(toTable(obj))
+            : null;
     }
     
     public JobTable update(UUID id, JobTableItemDTO obj) {
-        var user = userService.getUserByLogin(SecurityConfig.getUserName());
         var jobTable = findById(id);
-        if(jobTable != null && obj != null){
-            jobTable.setId(obj.getId() == null ? UUID.randomUUID() : obj.getId());
-            jobTable.setTable_id(getMd5Hash(user.getUserId().toString(), obj.getDate_from().toString(), obj.getDate_to().toString()));
-            jobTable.setUser(user);
-            jobTable.setDateFrom(obj.getDate_from());
-            jobTable.setDateTo(obj.getDate_to());
-            jobTable.setProject(projectService.findById(obj.getProject_id()));
-            jobTable.setProjectType(obj.getProjectType());
-            jobTable.setProjectDescription(obj.getProjectDescription());
-            jobTable.setMonday(obj.getMonday());
-            jobTable.setTuesday(obj.getTuesday());
-            jobTable.setWednesday(obj.getWednesday());
-            jobTable.setThursday(obj.getThursday());
-            jobTable.setFriday(obj.getFriday());
-            jobTable.setSaturday(obj.getSaturday());
-            jobTable.setSunday(obj.getSunday());
-            return repository.save(jobTable);
-        }
-        return null;
+        return jobTable != null && obj != null
+                ? toTable(obj)
+                : null;
     }
 
     @SneakyThrows

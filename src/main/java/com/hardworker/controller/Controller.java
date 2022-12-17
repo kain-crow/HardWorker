@@ -1,8 +1,10 @@
 package com.hardworker.controller;
 
 import com.hardworker.DTO.JobTableItemDTO;
+import com.hardworker.DTO.ProfileDTO;
 import com.hardworker.DTO.ProjectDTO;
 import com.hardworker.DTO.UserDTO;
+import com.hardworker.config.SecurityConfig;
 import com.hardworker.entity.JobTable;
 import com.hardworker.entity.Project;
 import com.hardworker.entity.Role;
@@ -11,9 +13,12 @@ import com.hardworker.service.JobTableService;
 import com.hardworker.service.ProjectService;
 import com.hardworker.service.RoleService;
 import com.hardworker.service.UserService;
+
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,6 +47,19 @@ public class Controller {
         this.roleService = roleService;
         this.projectService = projectService;
         this.jobTableService = jobTableService;
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<ProfileDTO> getProfile(){
+        var userDetails = SecurityConfig.getCustomUserDetails();
+        if(userDetails == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        var user = userService.getUserByLogin(userDetails.getUsername());
+        if(user == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.ok(ProfileDTO.of(user));
     }
 
     @GetMapping("/users")

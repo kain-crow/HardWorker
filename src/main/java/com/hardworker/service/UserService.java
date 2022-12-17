@@ -3,10 +3,12 @@ package com.hardworker.service;
 import com.hardworker.DTO.UserDTO;
 import com.hardworker.entity.User;
 import com.hardworker.repository.UserRepository;
-import java.util.Arrays;
+
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Component;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -19,11 +21,13 @@ public class UserService {
     
     private final UserRepository repository;
     private final RoleService roleService;
+    private final ProjectService projectService;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository repository, RoleService roleService, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository repository, RoleService roleService, ProjectService projectService, PasswordEncoder passwordEncoder) {
         this.repository = repository;
         this.roleService = roleService;
+        this.projectService = projectService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -38,38 +42,37 @@ public class UserService {
     public User getUserById(UUID id) {
         return repository.findById(id).orElse(null);
     }
-    
-    public User create(UserDTO obj){
-        var user = new User();
-        var role = roleService.findByRole(obj.getRole());
-        user.setUserId(obj.getId() == null ? UUID.randomUUID() : obj.getId());
-        user.setActive(Boolean.TRUE);
-        user.setPassword(obj.getPassword() != null ? passwordEncoder.encode(obj.getPassword()) : null);
-        user.setDepartment(obj.getDepartment());
-        user.setLogin(obj.getLogin());
-        user.setUsername(obj.getUsername());
-        if (role != null){
-            user.setRole(role);
-            user.setUserRoles(List.of(role));
-        }
-        return repository.save(user);
-    }
-    
-    public User update(UUID id, UserDTO obj) {
-        var user = getUserById(id);
-        if(user != null && obj != null){
-            user.setUserId(obj.getId() == null ? UUID.randomUUID() : obj.getId());
+
+    private User toUser(UserDTO dto){
+        if(dto != null) {
+            var user = new User();
+            user.setUserId(dto.getId() == null ? UUID.randomUUID() : dto.getId());
             user.setActive(Boolean.TRUE);
-            user.setPassword(obj.getPassword() != null ? passwordEncoder.encode(obj.getPassword()) : null);
-            user.setDepartment(obj.getDepartment());
-            user.setLogin(obj.getLogin());
-            user.setUsername(obj.getUsername());
-            var role = roleService.findByRole(obj.getRole());
+            user.setPassword(dto.getPassword() != null ? passwordEncoder.encode(dto.getPassword()) : null);
+            user.setDepartment(dto.getDepartment());
+            user.setLogin(dto.getLogin());
+            user.setUsername(dto.getUsername());
+            var role = roleService.findByRole(dto.getRole());
             if (role != null) {
                 user.setRole(role);
                 user.setUserRoles(List.of(role));
             }
-            return repository.save(user);
-        } return null;
+            user.setListProjects(dto.getListProjects().stream().map(projectService::findById).collect(Collectors.toSet()));
+            return user;
+        }
+        return null;
+    }
+    
+    public User create(UserDTO obj){
+        return obj != null
+            ? repository.save(toUser(obj))
+            : null;
+    }
+    
+    public User update(UUID id, UserDTO obj) {
+        var user = getUserById(id);
+        return user != null && obj != null
+            ? repository.save(toUser(obj))
+            : null;
     }
 }

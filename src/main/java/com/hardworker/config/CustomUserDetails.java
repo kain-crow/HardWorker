@@ -3,6 +3,7 @@ package com.hardworker.config;
 import com.hardworker.entity.User;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -27,6 +28,7 @@ public class CustomUserDetails implements UserDetails {
                         .collect(Collectors.toList());
     }
 
+    public UUID getId() { return user.getUserId(); }
     @Override
     public String getPassword() {
         return user.getPassword();

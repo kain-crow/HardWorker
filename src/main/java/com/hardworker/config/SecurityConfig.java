@@ -6,7 +6,9 @@ package com.hardworker.config;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 
+import com.hardworker.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,6 +41,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class SecurityConfig {
+
+    public static final String UNKNOWN_USERNAME = "<unknown>";
     
     @Bean
     public UserDetailsService userDetailsService(){ return new UserDetailsServiceImpl(); }
@@ -94,7 +98,7 @@ public class SecurityConfig {
                     .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
                 .and()
                     .authorizeRequests()
-                        .antMatchers("/users", "/user", "/roles", "/role", "/projects", "/project", "/tables", "/table")
+                        .antMatchers("/users", "/user", "/roles", "/role", "/projects", "/project", "/tables", "/table", "/profile")
                         .hasAnyRole("ADMIN", "USER")
                         .anyRequest().denyAll()
                 .and()
@@ -106,10 +110,22 @@ public class SecurityConfig {
                 .and().build();
     }
 
+    public static CustomUserDetails getCustomUserDetails(){
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication != null) {
+            Object principal = authentication.getPrincipal();
+            return principal instanceof CustomUserDetails
+                    ? (CustomUserDetails) principal
+                    : new CustomUserDetails(
+                            authentication.getDetails() instanceof CustomUserDetails
+                                ? ((User) authentication.getDetails())
+                                : null);
+        }
+        return null;
+    }
     public static String getUserName(){
-        var principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return principal instanceof UserDetails
-                ? ((UserDetails) principal).getUsername()
-                : principal.toString();
+        return Optional.ofNullable(getCustomUserDetails())
+                .map(CustomUserDetails::getUsername)
+                .orElse(UNKNOWN_USERNAME);
     }
 }

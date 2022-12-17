@@ -5,7 +5,12 @@
 package com.hardworker.DTO;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+
+import com.hardworker.entity.User;
 import lombok.Data;
 
 /**
@@ -22,5 +27,5 @@ public class UserDTO implements Serializable {
     private String password;
     private String role;
     private String department;
-    
+    private Set<UUID> listProjects = new HashSet<>();
 }
