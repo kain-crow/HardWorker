@@ -8,22 +8,23 @@ import com.hardworker.DTO.JobTableItemDTO;
 import com.hardworker.DTO.JobTableListDTO;
 import com.hardworker.config.SecurityConfig;
 import com.hardworker.entity.JobTable;
+import com.hardworker.repository.JobTableRepository;
+import lombok.SneakyThrows;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.util.*;
-
-import com.hardworker.repository.JobTableRepository;
-import lombok.SneakyThrows;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 /**
  *
  * @author Kain
  */
+@Log4j2
 @Component("jobTableService")
 public class JobTableService {
     
@@ -47,14 +48,14 @@ public class JobTableService {
         return list().stream().distinct().map(JobTableListDTO::of).toList();
     }
 
-    public  List<JobTable> findByTableId(String tableId) {
-        return repository.findAllByTableId(tableId);
-    }
-
     public JobTable findById(UUID id) {
         return repository.findById(id).orElse(null);
     }
-    
+
+    public List<JobTable> findAllByTableId(String tableId) {
+        return repository.findAllByTableId(tableId);
+    }
+
     public String deleteById(UUID id){
         if(findById(id) != null ){
             repository.deleteById(id);
@@ -81,6 +82,13 @@ public class JobTableService {
             jobTable.setFriday(dto.getFriday());
             jobTable.setSaturday(dto.getSaturday());
             jobTable.setSunday(dto.getSunday());
+            jobTable.setSum(dto.getMonday()
+                    + dto.getTuesday()
+                    + dto.getWednesday()
+                    + dto.getThursday()
+                    + dto.getFriday()
+                    + dto.getSaturday()
+                    + dto.getSunday());
             return jobTable;
         }
         return null;

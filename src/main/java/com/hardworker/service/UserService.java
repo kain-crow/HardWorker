@@ -3,15 +3,13 @@ package com.hardworker.service;
 import com.hardworker.DTO.UserDTO;
 import com.hardworker.entity.User;
 import com.hardworker.repository.UserRepository;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  *
@@ -23,12 +21,14 @@ public class UserService {
     private final UserRepository repository;
     private final RoleService roleService;
     private final ProjectService projectService;
+    private final DepartmentService departmentService;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository repository, RoleService roleService, @Lazy ProjectService projectService, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository repository, RoleService roleService, @Lazy ProjectService projectService, DepartmentService departmentService, PasswordEncoder passwordEncoder) {
         this.repository = repository;
         this.roleService = roleService;
         this.projectService = projectService;
+        this.departmentService = departmentService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -50,7 +50,7 @@ public class UserService {
             user.setUserId(dto.getId() == null ? UUID.randomUUID() : dto.getId());
             user.setActive(Boolean.TRUE);
             user.setPassword(dto.getPassword() != null ? passwordEncoder.encode(dto.getPassword()) : null);
-            user.setDepartment(dto.getDepartment());
+            user.setDepartment(departmentService.findDepartmentByDepartmentName(dto.getDepartment()));
             user.setLogin(dto.getLogin());
             user.setUsername(dto.getUsername());
             var role = roleService.findByRole(dto.getRole());

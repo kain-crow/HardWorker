@@ -7,7 +7,7 @@ package com.hardworker.entity;
 import lombok.*;
 import org.hibernate.Hibernate;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 import java.sql.Date;
 import java.util.Objects;
@@ -19,7 +19,7 @@ import java.util.UUID;
  */
 
 @Entity
-@javax.persistence.Table(name = "job_table")
+@Table(name = "job_table")
 @Getter
 @Setter
 @ToString
@@ -76,6 +76,9 @@ public class JobTable implements Serializable {
     
     @Column(name = "sunday")
     private Integer sunday;
+
+    @Column(name = "sum")
+    private Integer sum;
 
     @Override
     public boolean equals(Object o) {

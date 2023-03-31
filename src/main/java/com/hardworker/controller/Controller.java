@@ -13,19 +13,15 @@ import com.hardworker.service.JobTableService;
 import com.hardworker.service.ProjectService;
 import com.hardworker.service.RoleService;
 import com.hardworker.service.UserService;
-
-import java.util.Optional;
-import java.util.UUID;
-
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
 
 /**
  *
@@ -33,7 +29,18 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class Controller {
-    
+
+    private static final int MIN_PAGE_VALUE = 0;
+    private static final String MIN_PAGE_MESSAGE = "Value of page must be >= " + MIN_PAGE_VALUE;
+    private static final String PAGE_DEFAULT_VALUE = "0";
+
+    private static final int MIN_SIZE_VALUE = 1;
+    private static final String MIN_SIZE_MESSAGE = "Value of size must be >= " + MIN_SIZE_VALUE;
+
+    private static final int MAX_SIZE_VALUE = 100;
+    private static final String MAX_SIZE_MESSAGE = "Value of size restricted to " + MAX_SIZE_VALUE;
+
+    private static final String SIZE_DEFAULT_VALUE = "10";
     private final UserService userService;
     private final RoleService roleService;
     private final ProjectService projectService;
@@ -49,6 +56,7 @@ public class Controller {
         this.jobTableService = jobTableService;
     }
 
+    /*============================================GET======================================================*/
     @GetMapping("/profile")
     public ResponseEntity<ProfileDTO> getProfile(){
         var userDetails = SecurityConfig.getCustomUserDetails();
@@ -63,25 +71,66 @@ public class Controller {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<Object> getUsers(){
+    public ResponseEntity<Object> getUsers(
+            @Min(value = MIN_PAGE_VALUE, message = MIN_PAGE_MESSAGE)
+            @RequestParam(required = false, defaultValue = PAGE_DEFAULT_VALUE) int page,
+
+            @Max(value = MAX_SIZE_VALUE, message = MAX_SIZE_MESSAGE)
+            @Min(value = MIN_SIZE_VALUE, message = MIN_SIZE_MESSAGE)
+            @RequestParam(required = false, defaultValue = SIZE_DEFAULT_VALUE) int size
+    ){
         return ResponseEntity.ok(userService.list());
     }
     
     @GetMapping("/roles")
-    public ResponseEntity<Object> getRoles(){
+    public ResponseEntity<Object> getRoles(
+            @Min(value = MIN_PAGE_VALUE, message = MIN_PAGE_MESSAGE)
+            @RequestParam(required = false, defaultValue = PAGE_DEFAULT_VALUE) int page,
+
+            @Max(value = MAX_SIZE_VALUE, message = MAX_SIZE_MESSAGE)
+            @Min(value = MIN_SIZE_VALUE, message = MIN_SIZE_MESSAGE)
+            @RequestParam(required = false, defaultValue = SIZE_DEFAULT_VALUE) int size
+    ){
         return ResponseEntity.ok(roleService.list());
     }
     
     @GetMapping("/projects")
-    public ResponseEntity<Object> getProjects() {
+    public ResponseEntity<Object> getProjects(
+            @Min(value = MIN_PAGE_VALUE, message = MIN_PAGE_MESSAGE)
+            @RequestParam(required = false, defaultValue = PAGE_DEFAULT_VALUE) int page,
+
+            @Max(value = MAX_SIZE_VALUE, message = MAX_SIZE_MESSAGE)
+            @Min(value = MIN_SIZE_VALUE, message = MIN_SIZE_MESSAGE)
+            @RequestParam(required = false, defaultValue = SIZE_DEFAULT_VALUE) int size
+    ) {
         return ResponseEntity.ok(projectService.list());
     }
     
     @GetMapping("/tables")
-    public ResponseEntity<Object> getTables() {
+    public ResponseEntity<Object> getTables(
+            @Min(value = MIN_PAGE_VALUE, message = MIN_PAGE_MESSAGE)
+            @RequestParam(required = false, defaultValue = PAGE_DEFAULT_VALUE) int page,
+
+            @Max(value = MAX_SIZE_VALUE, message = MAX_SIZE_MESSAGE)
+            @Min(value = MIN_SIZE_VALUE, message = MIN_SIZE_MESSAGE)
+            @RequestParam(required = false, defaultValue = SIZE_DEFAULT_VALUE) int size
+    ) {
         return ResponseEntity.ok(jobTableService.listTables());
     }
-    
+
+    @GetMapping("/tables/data")
+    public ResponseEntity<List<JobTable>> getTables(
+            @RequestParam(name = "tableId") String tableId,
+            @Min(value = MIN_PAGE_VALUE, message = MIN_PAGE_MESSAGE)
+            @RequestParam(required = false, defaultValue = PAGE_DEFAULT_VALUE) int page,
+
+            @Max(value = MAX_SIZE_VALUE, message = MAX_SIZE_MESSAGE)
+            @Min(value = MIN_SIZE_VALUE, message = MIN_SIZE_MESSAGE)
+            @RequestParam(required = false, defaultValue = SIZE_DEFAULT_VALUE) int size
+    ) {
+        return ResponseEntity.ok(jobTableService.findAllByTableId(tableId));
+    }
+    /*===========================================POST======================================================*/
     @PostMapping("/role")
     public ResponseEntity<Role> createRole(@RequestBody Role role){
         return ResponseEntity.ok(roleService.create(role));
@@ -101,6 +150,8 @@ public class Controller {
     public ResponseEntity<JobTable> createTable(@RequestBody JobTableItemDTO table) {
         return ResponseEntity.ok(jobTableService.create(table));
     }
+
+    /*============================================PUT======================================================*/
     
     @PutMapping("/role")
     public ResponseEntity<Role> updateRole(@RequestParam UUID id, @RequestBody Role role) {

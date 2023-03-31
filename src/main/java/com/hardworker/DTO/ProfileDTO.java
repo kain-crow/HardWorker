@@ -10,7 +10,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -29,6 +29,7 @@ public class ProfileDTO implements Serializable {
     private String department;
     private String role;
     private Set<String> userRoles = new HashSet<>();
+    private Set<Object> listProjects = new HashSet<>();
 
     public static ProfileDTO of(User user) {
         var profile = new ProfileDTO();
@@ -36,9 +37,10 @@ public class ProfileDTO implements Serializable {
         profile.setLogin(user.getLogin());
         profile.setUsername(user.getUsername());
         profile.setActive(user.getActive());
-        profile.setDepartment(user.getDepartment());
+        profile.setDepartment(user.getDepartment().getDepartmentName());
         profile.setRole(user.getRole().getRole());
         profile.setUserRoles(user.getUserRoles().stream().map(Role::getRole).collect(Collectors.toSet()));
+        profile.setListProjects(user.getListProjects().stream().map(project -> Map.of("projectId", project.getProjectId(), "name", project.getName())).collect(Collectors.toSet()));
         return profile;
     }
 }

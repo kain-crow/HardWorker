@@ -4,27 +4,18 @@
  */
 package com.hardworker.config;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Optional;
-
 import com.hardworker.entity.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,12 +25,17 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Optional;
+
 /**
  *
  * @author Kain
  */
 @Configuration
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
+@EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class SecurityConfig {
 
     public static final String UNKNOWN_USERNAME = "<unknown>";
@@ -97,14 +93,14 @@ public class SecurityConfig {
                     .csrf().disable()
                     .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
                 .and()
-                    .authorizeRequests()
-                        .antMatchers("/users", "/user", "/roles", "/role", "/projects", "/project", "/tables", "/table", "/profile")
+                    .authorizeHttpRequests((auth)-> auth
+                        .requestMatchers("/users", "/user", "/roles", "/role", "/projects", "/project", "/tables/**", "/table", "/profile")
                         .hasAnyRole("ADMIN", "USER")
                         .anyRequest().denyAll()
+                    )
+                .formLogin().permitAll()
                 .and()
-                    .formLogin().permitAll()
-                    .and()
-                    .logout().permitAll()
+                .logout().permitAll()
 //                .and()
   //                  .cors().configurationSource(corsConfigurationSource())
                 .and().build();
