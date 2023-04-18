@@ -11,6 +11,8 @@ import com.hardworker.entity.JobTable;
 import com.hardworker.repository.JobTableRepository;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
@@ -48,12 +50,16 @@ public class JobTableService {
         return list().stream().distinct().map(JobTableListDTO::of).toList();
     }
 
+    public Page<JobTable> listTablesPages(Integer page, Integer size){
+        return repository.findDistinctJobTables(PageRequest.of(page, size));
+    }
+
     public JobTable findById(UUID id) {
         return repository.findById(id).orElse(null);
     }
 
-    public List<JobTable> findAllByTableId(String tableId) {
-        return repository.findAllByTableId(tableId);
+    public Page<JobTable> findAllByTableIdPages(String tableId, Integer page, Integer size) {
+        return repository.findAllByTableId(tableId, PageRequest.of(page, size));
     }
 
     public String deleteById(UUID id){
@@ -65,14 +71,14 @@ public class JobTableService {
 
     private JobTable toTable(JobTableItemDTO dto){
         if(dto != null) {
-            var user = userService.getUserByLogin(SecurityConfig.getUserName());
+            var user = userService.findUserByLogin(SecurityConfig.getUserName());
             var jobTable = new JobTable();
             jobTable.setId(dto.getId() == null ? UUID.randomUUID() : dto.getId());
-            jobTable.setTable_id(getMd5Hash(user.getUserId().toString(), dto.getDate_from().toString(), dto.getDate_to().toString()));
+            jobTable.setTableId(getMd5Hash(user.getUserId().toString(), dto.getDateFrom().toString(), dto.getDateTo().toString()));
             jobTable.setUser(user);
-            jobTable.setDateFrom(dto.getDate_from());
-            jobTable.setDateTo(dto.getDate_to());
-            jobTable.setProject(projectService.findById(dto.getProject_id()));
+            jobTable.setDateFrom(dto.getDateFrom());
+            jobTable.setDateTo(dto.getDateTo());
+            jobTable.setProject(projectService.findById(dto.getProjectId()));
             jobTable.setProjectType(dto.getProjectType());
             jobTable.setProjectDescription(dto.getProjectDescription());
             jobTable.setMonday(dto.getMonday());

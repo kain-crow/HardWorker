@@ -18,13 +18,11 @@ import java.util.UUID;
 public class JobTableItemDTO implements Serializable {
 
     private UUID id;
-    private String table_id;
-    private UUID user_id;
-    private String userName;
-    private Date date_from;
-    private Date date_to;
-    private UUID project_id;
-    private String project_name;
+    private String tableId;
+    private UUID userId;
+    private Date dateFrom;
+    private Date dateTo;
+    private UUID projectId;
     private String projectType;
     private String projectDescription;
     private Integer monday;

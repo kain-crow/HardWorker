@@ -7,12 +7,14 @@ package com.hardworker.service;
 import com.hardworker.DTO.ProjectDTO;
 import com.hardworker.entity.Project;
 import com.hardworker.repository.ProjectRepository;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Component;
+
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 
 /**
  *
@@ -32,6 +34,10 @@ public class ProjectService {
     public List<Project> list() {
         return repository.findAll();
     }
+
+    public Page<Project> list(Integer page, Integer size) {
+        return repository.findAll(PageRequest.of(page, size));
+    }
     
     public Project findById(UUID id){
         return repository.findById(id).orElse(null);
@@ -46,7 +52,7 @@ public class ProjectService {
     }
 
     public Project getProjectByName(String name) {
-        return repository.getProjectByName(name);
+        return repository.findByName(name);
     }
 
     private Project toProject(ProjectDTO dto){
@@ -55,8 +61,9 @@ public class ProjectService {
             project.setProjectId(dto.getId() == null ? UUID.randomUUID() : dto.getId());
             project.setName(dto.getName());
             project.setCustomer(dto.getCustomer());
+            project.setLaidTime(dto.getLaidTime());
             project.setListUsers(dto.getListUsers() != null
-                    ? dto.getListUsers().stream().map(userService::getUserById).collect(Collectors.toSet())
+                    ? dto.getListUsers().stream().map(userService::findUserById).collect(Collectors.toSet())
                     : null);
             return project;
         }

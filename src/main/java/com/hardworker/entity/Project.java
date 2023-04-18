@@ -33,6 +33,9 @@ public class Project implements Serializable {
     @Column(name = "customer")
     private String customer;
 
+    @Column(name = "laid_time")
+    private Integer laidTime;
+
     @ManyToMany(mappedBy = "listProjects", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<User> listUsers = new HashSet<>();
 

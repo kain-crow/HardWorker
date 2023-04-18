@@ -5,12 +5,10 @@
 package com.hardworker.DTO;
 
 import com.hardworker.entity.JobTable;
-import com.hardworker.entity.User;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.sql.Date;
-import java.util.UUID;
 
 /**
  *
@@ -19,17 +17,19 @@ import java.util.UUID;
 @Data
 public class JobTableListDTO implements Serializable {
 
-    private String table_id;
-    private User user_id;
-    private Date date_from;
-    private Date date_to;
+    private String tableId;
+    private String userName;
+    private String departmentName;
+    private Date dateFrom;
+    private Date dateTo;
 
     public static JobTableListDTO of(JobTable jobTable){
         var dto = new JobTableListDTO();
-        dto.setTable_id(jobTable.getTable_id());
-        dto.setUser_id(jobTable.getUser());
-        dto.setDate_from(jobTable.getDateFrom());
-        dto.setDate_to(jobTable.getDateTo());
+        dto.setTableId(jobTable.getTableId());
+        dto.setUserName(jobTable.getUser().getUsername());
+        dto.setDepartmentName(jobTable.getUser().getDepartment().getDepartmentName());
+        dto.setDateFrom(jobTable.getDateFrom());
+        dto.setDateTo(jobTable.getDateTo());
         return dto;
     }
 

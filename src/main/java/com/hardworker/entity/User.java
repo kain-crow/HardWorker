@@ -1,10 +1,13 @@
 package com.hardworker.entity;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import lombok.*;
-
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+
 import java.io.Serializable;
 import java.util.*;
 
@@ -55,6 +58,7 @@ public class User implements Serializable {
             )
     private List<Role> userRoles = new ArrayList<>();
 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(
             name = "rel_project_user",

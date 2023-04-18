@@ -7,6 +7,8 @@ package com.hardworker.service;
 import com.hardworker.DTO.DepartmentDTO;
 import com.hardworker.entity.Department;
 import com.hardworker.repository.DepartmentRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -27,6 +29,10 @@ public class DepartmentService {
 
     public List<Department> list() {
         return repository.findAll();
+    }
+
+    public Page<Department> listPage(Integer page, Integer size) {
+        return repository.findAll(PageRequest.of(page, size));
     }
     
     public Department findById(UUID id){

@@ -6,10 +6,12 @@ package com.hardworker.service;
 
 import com.hardworker.entity.Role;
 import com.hardworker.repository.RoleRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Component;
+
 import java.util.List;
 import java.util.UUID;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  *
@@ -24,8 +26,14 @@ public class RoleService {
         this.repository = repository;
     }
 
+
+
     public List<Role> list(){
         return repository.findAll();
+    }
+
+    public Page<Role> list(Integer page, Integer size){
+        return repository.findAll(PageRequest.of(page, size));
     }
     
     public Role findByRole(String role){
@@ -34,6 +42,13 @@ public class RoleService {
     
     public Role findById(UUID id) {
         return repository.findById(id).orElse(null);
+    }
+
+    public String deleteById(UUID id){
+        if(findById(id) != null ){
+            repository.deleteById(id);
+            return String.format("Role with id %s has been deleted", id);
+        } return String.format("Role with id %s not found", id);
     }
     
     public Role create(Role obj){

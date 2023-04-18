@@ -4,10 +4,12 @@
  */
 package com.hardworker.DTO;
 
-import java.io.Serializable;
-import java.util.*;
-
 import lombok.Data;
+
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  *
@@ -18,5 +20,6 @@ public class ProjectDTO implements Serializable{
     private UUID id;
     private String name;
     private String customer;
+    private Integer laidTime;
     private Set<UUID> listUsers = new HashSet<>();
 }

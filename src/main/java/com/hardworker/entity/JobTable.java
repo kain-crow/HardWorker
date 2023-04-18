@@ -4,13 +4,14 @@
  */
 package com.hardworker.entity;
 
-import lombok.*;
-import org.hibernate.Hibernate;
-
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.io.Serializable;
 import java.sql.Date;
-import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -32,11 +33,10 @@ public class JobTable implements Serializable {
     private UUID id;
 
     @Column(name = "table_id")
-    private String table_id;
+    private String tableId;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
-    @ToString.Exclude
     private User user;
 
     @Column(name = "date_from")
@@ -47,7 +47,6 @@ public class JobTable implements Serializable {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "project")
-    @ToString.Exclude
     private Project project;
     
     @Column(name = "project_type")
@@ -79,14 +78,6 @@ public class JobTable implements Serializable {
 
     @Column(name = "sum")
     private Integer sum;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        JobTable jobTable = (JobTable) o;
-        return table_id != null && Objects.equals(table_id, jobTable.table_id);
-    }
 
     @Override
     public int hashCode() {

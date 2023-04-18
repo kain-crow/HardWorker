@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.hardworker.config;
 
 import com.hardworker.entity.User;
@@ -94,7 +90,7 @@ public class SecurityConfig {
                     .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
                 .and()
                     .authorizeHttpRequests((auth)-> auth
-                        .requestMatchers("/users", "/user", "/roles", "/role", "/projects", "/project", "/tables/**", "/table", "/profile")
+                        .requestMatchers("/users", "/user", "/roles", "/role", "/projects", "/project", "/tables/**", "/table", "/profile", "/departments")
                         .hasAnyRole("ADMIN", "USER")
                         .anyRequest().denyAll()
                     )
