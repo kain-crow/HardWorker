@@ -1,7 +1,6 @@
 package com.hardworker.entity;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -58,13 +57,13 @@ public class User implements Serializable {
             )
     private List<Role> userRoles = new ArrayList<>();
 
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "rel_project_user",
-            joinColumns = @JoinColumn(name = "id_user"),
-            inverseJoinColumns = @JoinColumn(name = "id_project")
-    )
+//    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    @JoinTable(
+//            name = "rel_project_user",
+//            joinColumns = @JoinColumn(name = "id_user"),
+//            inverseJoinColumns = @JoinColumn(name = "id_project")
+//    )
+    @ManyToMany(mappedBy = "listUsers", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Project> listProjects = new HashSet<>();
 
 }

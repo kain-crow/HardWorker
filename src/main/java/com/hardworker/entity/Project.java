@@ -36,7 +36,13 @@ public class Project implements Serializable {
     @Column(name = "laid_time")
     private Integer laidTime;
 
-    @ManyToMany(mappedBy = "listProjects", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    @ManyToMany(mappedBy = "listProjects", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "rel_project_user",
+            joinColumns = @JoinColumn(name = "id_project"),
+            inverseJoinColumns = @JoinColumn(name = "id_user")
+    )
     private Set<User> listUsers = new HashSet<>();
 
 }

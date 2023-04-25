@@ -57,36 +57,36 @@ public class UserService {
         } return String.format("User with id %s not found", id);
     }
 
-    private User toUser(UserDTO dto){
+    private User toUser(UserDTO dto, User user){
         if(dto != null) {
-            var user = new User();
-            user.setUserId(dto.getId() == null ? UUID.randomUUID() : dto.getId());
-            user.setActive(Boolean.TRUE);
-            user.setPassword(dto.getPassword() != null ? passwordEncoder.encode(dto.getPassword()) : null);
-            user.setDepartment(departmentService.findDepartmentByDepartmentName(dto.getDepartment()));
-            user.setLogin(dto.getLogin());
-            user.setUsername(dto.getUsername());
+            var obj = user != null ? user : new User();
+            obj.setUserId(dto.getId() == null ? UUID.randomUUID() : dto.getId());
+            obj.setActive(Boolean.TRUE);
+            obj.setPassword(dto.getPassword() != null ? passwordEncoder.encode(dto.getPassword()) : null);
+            obj.setDepartment(departmentService.findDepartmentByDepartmentName(dto.getDepartment()));
+            obj.setLogin(dto.getLogin());
+            obj.setUsername(dto.getUsername());
             var role = roleService.findByRole(dto.getRole());
             if (role != null) {
-                user.setRole(role);
-                user.setUserRoles(List.of(role));
+                obj.setRole(role);
+                obj.setUserRoles(List.of(role));
             }
-            user.setListProjects(dto.getListProjects().stream().map(projectService::findById).collect(Collectors.toSet()));
-            return user;
+            obj.setListProjects(dto.getListProjects().stream().map(projectService::findById).collect(Collectors.toSet()));
+            return obj;
         }
         return null;
     }
     
     public User create(UserDTO obj){
         return obj != null
-            ? repository.save(toUser(obj))
+            ? repository.save(toUser(obj, null))
             : null;
     }
     
-    public User update(UUID id, UserDTO obj) {
-        var user = findUserById(id);
-        return user != null && obj != null
-            ? repository.save(toUser(obj))
+    public User update(UserDTO obj) {
+        var user = findUserById(obj.getId());
+        return user != null
+            ? repository.save(toUser(obj, user))
             : null;
     }
 }

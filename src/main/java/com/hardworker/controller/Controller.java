@@ -77,7 +77,11 @@ public class Controller {
             @Min(value = MIN_SIZE_VALUE, message = MIN_SIZE_MESSAGE)
             @RequestParam(required = false, defaultValue = SIZE_DEFAULT_VALUE) int size
     ){
-        return ResponseEntity.ok(new ResponseDTO<>(userService.list(page, size)));
+        var result = userService.list(page, size);
+        return ResponseEntity.ok(new ResponseDTO<>(
+                result.getTotalPages(),
+                result.getTotalElements(),
+                result.getContent().stream().map(ProfileDTO::of).toList()));
     }
     
     @GetMapping("/roles")
@@ -101,7 +105,11 @@ public class Controller {
             @Min(value = MIN_SIZE_VALUE, message = MIN_SIZE_MESSAGE)
             @RequestParam(required = false, defaultValue = SIZE_DEFAULT_VALUE) int size
     ) {
-        return ResponseEntity.ok(new ResponseDTO<>(projectService.list(page, size)));
+        var result = projectService.list(page, size);
+        return ResponseEntity.ok(new ResponseDTO<>(
+                result.getTotalPages(),
+                result.getTotalElements(),
+                result.getContent().stream().map(ProjectDTO::of).toList()));
     }
     
     @GetMapping("/tables")
@@ -168,23 +176,23 @@ public class Controller {
     /*============================================PUT======================================================*/
     
     @PutMapping(ROLE_ENDPOINT)
-    public ResponseEntity<Role> updateRole(@RequestParam UUID id, @RequestBody Role role) {
-        return ResponseEntity.ok(roleService.update(id, role));
+    public ResponseEntity<Role> updateRole(@RequestBody Role role) {
+        return ResponseEntity.ok(roleService.update(role));
     }
 
     @PutMapping(USER_ENDPOINT)
-    public ResponseEntity<User> updateUser(@RequestParam UUID id, @RequestBody UserDTO user) {
-        return ResponseEntity.ok(userService.update(id, user));
+    public ResponseEntity<User> updateUser(@RequestBody UserDTO user) {
+        return ResponseEntity.ok(userService.update(user));
     }
     
     @PutMapping(PROJECT_ENDPOINT)
-    public ResponseEntity<Project> updateProject(@RequestParam UUID id, @RequestBody ProjectDTO project) {
-        return ResponseEntity.ok(projectService.update(id, project));
+    public ResponseEntity<Project> updateProject(@RequestBody ProjectDTO project) {
+        return ResponseEntity.ok(projectService.update(project));
     }
     
     @PutMapping(TABLE_ENDPOINT)
-    public ResponseEntity<JobTable> updateTable(@RequestParam UUID id, @RequestBody JobTableItemDTO table) {
-        return ResponseEntity.ok(jobTableService.update(id, table));
+    public ResponseEntity<JobTable> updateTable(@RequestBody JobTableItemDTO table) {
+        return ResponseEntity.ok(jobTableService.update(table));
     }
 
     /*===========================================DELETE====================================================*/

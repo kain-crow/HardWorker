@@ -58,9 +58,9 @@ public class RoleService {
         return repository.save(role);
     }
     
-    public Role update(UUID id, Role obj) {
-        var role = findById(id);
-        if(role != null && obj != null){
+    public Role update(Role obj) {
+        var role = findById(obj.getId());
+        if(role != null){
             role.setRole(obj.getRole());
             return repository.save(role);
         } return null;

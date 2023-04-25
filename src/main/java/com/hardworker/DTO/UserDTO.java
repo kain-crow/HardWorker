@@ -4,14 +4,12 @@
  */
 package com.hardworker.DTO;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
-import com.hardworker.entity.User;
-import lombok.Data;
 
 /**
  *

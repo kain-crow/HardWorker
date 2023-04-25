@@ -51,26 +51,26 @@ public class DepartmentService {
         return String.format("Department with id %s not found", id);
     }
 
-    private Department toDepartment(DepartmentDTO dto){
+    private Department toDepartment(DepartmentDTO dto, Department department){
         if(dto != null){
-            var department = new Department();
-            department.setId(dto.getId() == null ? UUID.randomUUID() : dto.getId());
-            department.setDepartmentName(dto.getDepartmentName());
-            return department;
+            var obj = department != null ? department : new Department();
+            obj.setId(dto.getId() == null ? UUID.randomUUID() : dto.getId());
+            obj.setDepartmentName(dto.getDepartmentName());
+            return obj;
         }
         return null;
     }
     
     public Department create(DepartmentDTO obj){
         return obj != null
-            ? repository.save(toDepartment(obj))
+            ? repository.save(toDepartment(obj, null))
             : null;
     }
     
     public Department update(UUID id, DepartmentDTO obj){
         var department = findById(id);
         return department != null && obj != null
-                ? repository.save(toDepartment(obj))
+                ? repository.save(toDepartment(obj, department))
                 : null;
     }
 }
